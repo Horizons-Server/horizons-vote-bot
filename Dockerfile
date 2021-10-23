@@ -1,8 +1,8 @@
 FROM node:16
 WORKDIR /app
-COPY package.json /app
-COPY yarn.lock /app
+COPY package.json .
+COPY yarn.lock .
 RUN yarn
-COPY . ./app
+COPY . .
 
 CMD ["npm", "run", "start"] 
