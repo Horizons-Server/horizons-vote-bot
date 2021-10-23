@@ -58,7 +58,7 @@ module.exports = {
 **First Deadline**: <t:${Math.floor(firstDeadline.getTime() / 1000)}:R>`,
 				fetchReply: true,
 			});
-			msg.react("🏓");
+			msg.react("✋");
 
 			const channelId = interaction.channel.id;
 
@@ -94,7 +94,7 @@ async function extend(msgId, channelId, time, first, userId, name, count) {
 		const channel = client.channels.cache.get(channelId);
 
 		const numObjections = (
-			await channel.messages.cache.get(msgId).reactions.resolve("🏓").fetch()
+			await channel.messages.cache.get(msgId).reactions.resolve("✋").fetch()
 		).count;
 
 		if (numObjections > 1) {
