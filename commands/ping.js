@@ -123,5 +123,5 @@ async function extend(msgId, channelId, time, first, userId, name, count) {
 				);
 			}
 		} else channel.send(`Vote "${name}" by <@${userId}> has passed.`);
-	}, time * 1000 /** * 60 * 60 */);
+	}, time * 1000 * 60 * 60);
 }
