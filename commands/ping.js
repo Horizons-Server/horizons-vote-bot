@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { client } = require("../client");
 
-const times = { town: 24, rail: 24, airport: 24 * 7 };
-const format = { town: "Town", rail: "Rail", airport: "Airport" };
+const times = { town: 24, rail: 24, misc: 24, airport: 24 * 7 };
+const format = { town: "Town", rail: "Rail", misc: "Misc", airport: "Airport" };
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -28,6 +28,7 @@ module.exports = {
 				.addChoice("Town", "town")
 				.addChoice("Airport", "airport")
 				.addChoice("Rail", "rail")
+				.addChoice("Misc", "misc")
 		),
 	async execute(interaction) {
 		const name = interaction.options.data[0].value;
