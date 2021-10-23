@@ -1,8 +1,13 @@
-FROM node:16
-WORKDIR /app
-COPY package.json .
-COPY yarn.lock .
-RUN yarn
-COPY . .
+FROM node:latest
 
-CMD ["npm", "run", "start"] 
+# Create the bot's directory
+RUN mkdir -p /usr/src/bot
+WORKDIR /usr/src/bot
+
+COPY package.json /usr/src/bot
+RUN npm install
+
+COPY . /usr/src/bot
+
+# Start the bot.
+CMD ["node", "index.cjs"]
