@@ -55,7 +55,8 @@ module.exports = {
 **Description**: ${interaction.options.data[1].value}
 **Proposed By**: <@${userId}>
 **Proposal Type**: ${format[interaction.options.data[2].value]}
-**First Deadline**: <t:${Math.floor(firstDeadline.getTime() / 1000)}:R>`,
+**First Deadline**: <t:${Math.floor(firstDeadline.getTime() / 1000)}:R>
+Press ✋ to object to this development.`,
 				fetchReply: true,
 			});
 			msg.react("✋");
