@@ -7,7 +7,7 @@ const format = { town: "Town", rail: "Rail", misc: "Misc", airport: "Airport" };
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("votedev")
-		.setDescription("Replies with Pong!")
+		.setDescription("Starts for a vote for a development.")
 		.addStringOption((option) =>
 			option
 				.setName("title")
