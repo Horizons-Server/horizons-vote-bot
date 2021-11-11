@@ -20,6 +20,7 @@ const client = new Client({
     Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
   ],
+  botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
   silent: false,
 });
 
@@ -27,7 +28,10 @@ client.on("ready", () => {
   console.log(">> Bot started");
 
   // to create/update/delete discord application commands
-  client.initApplicationCommands();
+  client.initApplicationCommands({
+    global: { log: true },
+    guild: { log: true },
+  });
 });
 
 client.on("interactionCreate", (interaction: Interaction) => {

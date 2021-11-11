@@ -12,4 +12,4 @@ COPY . /usr/src/bot
 RUN npm run build
 
 # Start the bot.
-CMD ["npm start"]
+CMD ["npm", "run", "start"]
