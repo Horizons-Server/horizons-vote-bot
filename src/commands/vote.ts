@@ -2,12 +2,38 @@ import { Message } from "discord.js";
 import type { Client, TextChannel, CommandInteraction } from "discord.js";
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from "discordx";
 
-const voteLength: Record<string, number> = {
+type Ping = `<@${string}>`;
+type Timestamp = `<t:${number}:R>`;
+type DevVoteReply = `___Development Vote___
+**Name**: ${string}
+**Description**: ${string}
+**Proposed By**: ${Ping}
+**Proposal Type**: ${string}
+**First Deadline**: ${Timestamp}
+Press ✋ to object to this development.`;
+type DevVoteRenew =
+  `Vote "${string}" by ${Ping} has been extended due to objections. The new deadline is ${Timestamp}. This vote has been renewed ${number} times.`;
+
+const devVoteLength: Record<DevType, number> = {
   town: 24,
   rail: 24,
   misc: 24,
   airport: 24 * 7,
 };
+
+const displayValue: Record<DevType, string> = {
+  airport: "Airport ✈️",
+  misc: "Miscellaneous",
+  rail: "Rail 🚆",
+  town: "Town 🏘",
+};
+
+enum DevType {
+  Town = "town",
+  Rail = "rail",
+  Misc = "misc",
+  Airport = "airport",
+}
 
 @Discord()
 @SlashGroup("vote", "Start a vote on the server")
@@ -20,12 +46,9 @@ export abstract class AppDiscord {
       description: "The description of the development.",
     })
     description: string,
-    @SlashChoice("Town", "town")
-    @SlashChoice("Airport", "airport")
-    @SlashChoice("Rail", "rail")
-    @SlashChoice("Misc", "misc")
+    @SlashChoice(DevType)
     @SlashOption("type", { description: "The type of the development." })
-    type: string,
+    type: DevType,
     interaction: CommandInteraction,
   ) {
     // create a thread
@@ -37,25 +60,30 @@ export abstract class AppDiscord {
       name
     ) {
       const userId = interaction.user.id;
+      const username = interaction.user.username;
       const channelId = interaction.channel.id;
 
       const thread = await interaction.channel.threads.create({
-        name: `${name} by ${interaction.user.username}`,
+        name: `${name} by ${username}`,
         reason: `To discuss the topic at vote ${name}. `,
       });
       thread.members.add(userId);
 
       const firstDeadline = new Date();
-      firstDeadline.setHours(firstDeadline.getHours() + voteLength[type] ?? 24);
+      firstDeadline.setHours(
+        firstDeadline.getHours() + devVoteLength[type] ?? 24,
+      );
 
-      const msg = await interaction.reply({
-        content: `___Development Vote___
+      const messageContent: DevVoteReply = `___Development Vote___
 **Name**: ${name}
 **Description**: ${description}
-**Proposed By**: <@${userId}>
-**Proposal Type**: ${name.charAt(0).toUpperCase() + name.slice(1)}
-**First Deadline**: <t:${Math.floor(firstDeadline.getTime() / 1000)}:R>
-Press ✋ to object to this development.`,
+**Proposed By**: ${getPing(userId)}
+**Proposal Type**: ${displayValue[type]}
+**First Deadline**: ${getTimestamp(firstDeadline)}
+Press ✋ to object to this development.`;
+
+      const msg = await interaction.reply({
+        content: messageContent,
         fetchReply: true,
       });
       const { id: msgId } = msg;
@@ -68,20 +96,20 @@ Press ✋ to object to this development.`,
         msgId,
         userId,
         channelId,
-        time: voteLength[type] ?? 24,
+        time: devVoteLength[type] ?? 24,
         first: true,
         client: interaction.client,
         numberOfRenews: 0,
         name,
         emoji: "✋",
       });
-
-      // msg.react()
     } else {
       interaction.reply("How on earth did you manage this?");
     }
   }
 }
+
+// FIXME if anyone can figure out how to move this into other files without breaking the bot it would be much appreciated
 
 async function extendObjectionVote(params: {
   msgId: string;
@@ -125,15 +153,19 @@ async function extendObjectionVote(params: {
 
       if (objectionsCount > 1) {
         if (numberOfRenews > 3) {
-          const message = `Vote "${name}" by <@${userId}> has been renewed ${numberOfRenews} times. Since the vote still has objections, it has failed.`;
+          const message = `Vote "${name}" by ${getPing(
+            userId,
+          )} has been renewed ${numberOfRenews} times. Since the vote still has objections, it has failed.`;
           textChannel.send(message);
         } else {
           const deadline = new Date();
           const extendTime = first ? time / 2 : time;
           deadline.setHours(deadline.getHours() + extendTime);
-          const message = `Vote "${name}" by <@${userId}> has been extended due to objections. The new deadline is <t:${Math.floor(
-            deadline.getTime() / 1000,
-          )}:R>. This vote has been renewed ${numberOfRenews + 1} times.`;
+          const message: DevVoteRenew = `Vote "${name}" by ${getPing(
+            userId,
+          )} has been extended due to objections. The new deadline is ${getTimestamp(
+            deadline,
+          )}. This vote has been renewed ${numberOfRenews + 1} times.`;
 
           textChannel.send(message);
 
@@ -150,8 +182,13 @@ async function extendObjectionVote(params: {
           });
         }
       } else {
-        textChannel.send(`Vote "${name}" by <@${userId}> has passed.`);
+        textChannel.send(`Vote "${name}" by ${getPing(userId)} has passed.`);
       }
     }
   }, time * 1000 * 60 * 60);
 }
+
+const getTimestamp = (time: Date): Timestamp =>
+  `<t:${Math.floor(time.getTime() / 1000)}:R>`;
+
+const getPing = (user: string): Ping => `<@${user}>`;
