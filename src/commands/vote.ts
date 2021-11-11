@@ -29,7 +29,13 @@ export abstract class AppDiscord {
     interaction: CommandInteraction,
   ) {
     // create a thread
-    if (interaction.channel?.type === "GUILD_TEXT") {
+    if (
+      interaction.channel?.type === "GUILD_TEXT" &&
+      description &&
+      type &&
+      description &&
+      name
+    ) {
       const userId = interaction.user.id;
       const channelId = interaction.channel.id;
 
