@@ -1,7 +1,7 @@
 import type { Client, TextChannel } from "discord.js";
-import { DevVoteRenew } from "types/discord";
-import { getPing } from "./getPing";
-import { getTimestamp } from "./getTimestamp";
+import { DevVoteRenew } from "../types/discord.js";
+import { getPing } from "./getPing.js";
+import { getTimestamp } from "./getTimestamp.js";
 
 export async function extendObjectionVote(params: {
   msgId: string;

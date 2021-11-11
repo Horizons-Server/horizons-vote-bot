@@ -1,10 +1,10 @@
 import { Message } from "discord.js";
 import type { CommandInteraction } from "discord.js";
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from "discordx";
-import { DevVoteReply } from "types/discord";
-import { extendObjectionVote } from "lib/extendObjectionVote";
-import { getTimestamp } from "lib/getTimestamp";
-import { getPing } from "lib/getPing";
+import { DevVoteReply } from "../types/discord";
+import { extendObjectionVote } from "../lib/extendObjectionVote.js";
+import { getTimestamp } from "../lib/getTimestamp.js";
+import { getPing } from "../lib/getPing.js";
 
 const devVoteLength: Record<DevType, number> = {
   town: 24,
