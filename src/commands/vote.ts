@@ -5,6 +5,8 @@ import { DevVoteReply } from "../types/discord";
 import { extendObjectionVote } from "../lib/extendObjectionVote.js";
 import { getTimestamp } from "../lib/getTimestamp.js";
 import { getPing } from "../lib/getPing.js";
+import { addProposal, getAuthToken } from "../lib/sheet.js";
+import { Proposal } from "../interfaces/Proposal.js";
 
 const devVoteLength: Record<DevType, number> = {
   town: 24,
@@ -84,12 +86,28 @@ Press ✋ to object to this development.`;
         msg.react("✋");
       }
 
+      const uid = 88449507631;
+
+      const proposal: Proposal = {
+        uid,
+        name,
+        proposedBy: username,
+        type: displayValue[type],
+        description,
+        threadLink: `https://discord.com/channels/${interaction.guild?.id}/${channelId}/${thread.id}`,
+        dateProposed: Date.now(),
+        actionDate: firstDeadline.getTime(),
+      };
+
+      const auth = await getAuthToken();
+      addProposal(auth, proposal, "In Progress");
+
       extendObjectionVote({
+        uid,
         msgId,
         userId,
         channelId,
         time: devVoteLength[type] ?? 24,
-        first: true,
         client: interaction.client,
         numberOfRenews: 0,
         name,

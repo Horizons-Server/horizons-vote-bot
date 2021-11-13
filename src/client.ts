@@ -9,9 +9,6 @@ import { getAllProposals, getAuthToken } from "./lib/sheet.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config();
 
-const googleSheetsClient = await getAuthToken();
-console.log((await getAllProposals(googleSheetsClient)).inProgress, "HELLO");
-
 const client = new Client({
   botId: "test",
   // glob string to load the classes

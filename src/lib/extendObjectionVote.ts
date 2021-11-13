@@ -2,13 +2,19 @@ import type { Client, TextChannel } from "discord.js";
 import { DevVoteRenew } from "../types/discord.js";
 import { getPing } from "./getPing.js";
 import { getTimestamp } from "./getTimestamp.js";
+import {
+  addProposal,
+  getAllProposals,
+  getAuthToken,
+  removeProposal,
+} from "./sheet.js";
 
 export async function extendObjectionVote(params: {
   msgId: string;
   channelId: string;
+  uid: number;
   userId: string;
   time: number;
-  first: boolean;
   name: string;
 
   numberOfRenews: number;
@@ -20,9 +26,8 @@ export async function extendObjectionVote(params: {
     channelId,
     userId,
     time,
-    first,
+    uid,
     name,
-
     numberOfRenews,
     client,
     emoji,
@@ -49,9 +54,22 @@ export async function extendObjectionVote(params: {
             userId,
           )} has been renewed ${numberOfRenews} times. Since the vote still has objections, it has failed.`;
           textChannel.send(message);
+
+          const auth = await getAuthToken();
+          const allProposals = await getAllProposals(auth);
+          const proposal = allProposals.inProgress.filter(
+            (a) => a.uid === uid,
+          )[0];
+
+          removeProposal(auth, uid, allProposals);
+          addProposal(
+            auth,
+            { ...proposal, actionDate: Date.now() },
+            "Denied/Postponed",
+          );
         } else {
           const deadline = new Date();
-          const extendTime = first ? time / 2 : time;
+          const extendTime = numberOfRenews === 0 ? time / 2 : time;
           deadline.setHours(deadline.getHours() + extendTime);
           const message: DevVoteRenew = `Vote "${name}" by ${getPing(
             userId,
@@ -62,11 +80,11 @@ export async function extendObjectionVote(params: {
           textChannel.send(message);
 
           extendObjectionVote({
+            uid,
             msgId,
             channelId,
             userId,
             time: extendTime,
-            first: false,
             name,
             numberOfRenews: numberOfRenews + 1,
             client,
@@ -75,7 +93,17 @@ export async function extendObjectionVote(params: {
         }
       } else {
         textChannel.send(`Vote "${name}" by ${getPing(userId)} has passed.`);
+
+        const auth = await getAuthToken();
+        const allProposals = await getAllProposals(auth);
+        const proposal = allProposals.inProgress.filter(
+          (a) => a.uid === uid,
+        )[0];
+
+        removeProposal(auth, uid, allProposals);
+        //  console.log(proposal.dateProposed);
+        addProposal(auth, { ...proposal, actionDate: Date.now() }, "Approved");
       }
     }
-  }, time * 1000 * 60 * 60);
+  }, time * 500 /* 60 * 60*/);
 }
