@@ -1,39 +1,33 @@
-interface Proposal {
-  uid: number;
-  name: string;
-  proposedBy: string;
-  type: string;
-  description: string;
-  coordinates?: string;
-  imageLink?: string;
-  threadLink: string;
-  dateProposed: number;
-  actionDate?: number;
-  objections?: Array<string>;
-}
-
-interface AllProposals {
-  approved: Array<Proposal>;
-  denied: Array<Proposal>;
-  inProgress: Array<Proposal>;
-  all: Array<Proposal>;
-}
-
-type SheetName = "Approved" | "Denied/Postponed" | "In Progress";
-
-const { google } = require("googleapis");
-const { GoogleAuth } = require("google-auth-library");
+import { google } from "googleapis";
+import { GoogleAuth } from "google-auth-library";
+import type {
+  BaseExternalAccountClient,
+  Compute,
+  Impersonated,
+  JWT,
+  UserRefreshClient,
+} from "google-auth-library";
+import { Proposal } from "../interfaces/Proposal";
+import { AllProposals } from "../interfaces/AllProposals";
 const sheets = google.sheets("v4");
 const SHEET_ID = "1kKN0pLIOfLHy1O3AtKGd6Vw7OxU-Q88Jn4pli5m_MqU";
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const KEY_FILE = "credentials.json";
+
+type SheetName = "Approved" | "Denied/Postponed" | "In Progress";
+export type Auth =
+  | JWT
+  | Compute
+  | UserRefreshClient
+  | BaseExternalAccountClient
+  | Impersonated;
 
 /**
  * getAuthToken - authenticates the service account and returns an auth token
  *
  * @return authentication token for use in requests
  */
-async function getAuthToken() {
+export async function getAuthToken() {
   const auth = new GoogleAuth({
     keyFile: KEY_FILE,
     scopes: SCOPES,
@@ -49,7 +43,7 @@ async function getAuthToken() {
  * @param  auth authToken
  * @return all sheet information
  */
-async function getSpreadSheet(spreadsheetId: string, auth: string) {
+async function getSpreadSheet(spreadsheetId: string, auth: Auth) {
   const res = await sheets.spreadsheets.get({
     spreadsheetId,
     auth,
@@ -67,8 +61,8 @@ async function getSpreadSheet(spreadsheetId: string, auth: string) {
  */
 async function getSpreadSheetValues(
   spreadsheetId: string,
-  auth: string,
-  sheetName: SheetName
+  auth: Auth,
+  sheetName: SheetName,
 ) {
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
@@ -86,20 +80,24 @@ async function getSpreadSheetValues(
  * @param  [sheet="In Progress"] sheet to add proposal to
  * @return append response from google, else returns error
  */
-async function addProposal(auth: string, proposal: Proposal, sheet?: string) {
+export async function addProposal(
+  auth: Auth,
+  proposal: Proposal,
+  sheet: SheetName = "In Progress",
+) {
   const request = {
     // The ID of the spreadsheet to update.
     spreadsheetId: SHEET_ID,
 
     // The A1 notation of a range to search for a logical table of data.
     // Values are appended after the last row of the table.
-    range: `'${sheet ?? "In Progress"}'!A3:K3`,
+    range: `'${sheet}'!A3:K3`,
 
     // How the input data should be interpreted.
     valueInputOption: "USER_ENTERED",
 
     resource: {
-      range: `'${sheet ?? "In Progress"}'!A3:K3`,
+      range: `'${sheet}'!A3:K3`,
       majorDimension: "ROWS",
       values: [
         [
@@ -142,16 +140,16 @@ function parseSheetDate(date: string) {
   if (date == undefined) return undefined;
   if (date.split("/").length == 3) return new Date(date).getTime();
 
-  return parseInt(date.split("/")[0].substr(1));
+  return parseInt(date.split("/")[0].slice(1));
 }
 
 /**
  * arrayToProposal - converts an array from a sheet into a proposal object
  *
- * @param  input array to conver
+ * @param  input array to convert
  * @return converted proposal object
  */
-function arrayToProposal(input: Array<string>) {
+function arrayToProposal(input: string[]) {
   let newProposal: Proposal = {
     uid: parseInt(input[0]),
     name: input[1],
@@ -174,8 +172,8 @@ function arrayToProposal(input: Array<string>) {
  * @param auth authToken
  * @return all proposals object
  */
-async function getAllProposals(auth: string) {
-  let sheetsToIterate: Array<SheetName> = [
+export async function getAllProposals(auth: Auth) {
+  let sheetsToIterate: SheetName[] = [
     "Approved",
     "In Progress",
     "Denied/Postponed",
@@ -194,27 +192,29 @@ async function getAllProposals(auth: string) {
       let spreadsheet = await getSpreadSheetValues(SHEET_ID, auth, sheetName);
       let values = spreadsheet.data.values;
 
-      values.shift(); //ignore title rows
-      values.shift();
+      if (values) {
+        values.shift(); //ignore title rows
+        values.shift();
 
-      values.forEach((value: Array<string>) => {
-        let proposal = arrayToProposal(value);
-        switch (sheetName) {
-          case "Approved":
-            output.approved.push(proposal);
-            break;
-          case "In Progress":
-            output.inProgress.push(proposal);
-            break;
-          case "Denied/Postponed":
-            output.denied.push(proposal);
-            break;
-        }
-        output.all.push(proposal);
-      });
+        values.forEach((value: string[]) => {
+          const proposal = arrayToProposal(value);
+          switch (sheetName) {
+            case "Approved":
+              output.approved.push(proposal);
+              break;
+            case "In Progress":
+              output.inProgress.push(proposal);
+              break;
+            case "Denied/Postponed":
+              output.denied.push(proposal);
+              break;
+          }
+          output.all.push(proposal);
+        });
 
-      numToResolve--;
-      if (numToResolve == 0) resolve(true);
+        numToResolve--;
+        if (numToResolve == 0) resolve(true);
+      }
     });
   });
 
@@ -229,7 +229,7 @@ async function getAllProposals(auth: string) {
  * @param  authToken
  * @return batch response from google or error
  */
-async function deDupe(auth: string) {
+export async function deDupe(auth: Auth) {
   const request = {
     // The spreadsheet to apply the updates to.
     spreadsheetId: SHEET_ID,
@@ -312,10 +312,10 @@ async function deDupe(auth: string) {
  * @param  [allProposals] list of all proposals and their locations, will be retrieved if not provided
  * @return list of all proposals
  */
-async function removeProposal(
-  auth: string,
+export async function removeProposal(
+  auth: Auth,
   proposalId: number,
-  allProposals?: AllProposals
+  allProposals?: AllProposals,
 ) {
   allProposals = allProposals || (await getAllProposals(auth));
 
@@ -335,7 +335,7 @@ async function removeProposal(
   ) {
     sheetName = "In Progress";
     deletionIndex = allProposals.inProgress.findIndex(
-      (x) => x.uid == proposalId
+      (x) => x.uid == proposalId,
     );
   }
 
@@ -359,14 +359,6 @@ async function removeProposal(
     return err;
   }
 }
-
-module.exports = {
-  getAuthToken,
-  addProposal,
-  removeProposal,
-  getAllProposals,
-  deDupe,
-};
 
 //just some demo testing functions below
 // getAuthToken().then((authToken) => {
