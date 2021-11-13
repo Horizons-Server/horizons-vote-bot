@@ -68,6 +68,7 @@ async function getSpreadSheetValues(
     spreadsheetId,
     auth,
     range: sheetName,
+    valueRenderOption: "FORMULA",
   });
   return res;
 }
@@ -138,9 +139,14 @@ export async function addProposal(
  */
 function parseSheetDate(date: string) {
   if (date == undefined) return undefined;
-  if (date.split("/").length == 3) return new Date(date).getTime();
 
-  return parseInt(date.split("/")[0].slice(1));
+  let outDate;
+
+  if (date.split("/").length == 3) outDate = new Date(date).getTime();
+  else outDate = parseInt(date.split("/")[0].slice(1));
+
+  if (isNaN(outDate)) return undefined;
+  else return outDate;
 }
 
 /**
