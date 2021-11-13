@@ -7,6 +7,7 @@ import { getTimestamp } from "../lib/getTimestamp.js";
 import { getPing } from "../lib/getPing.js";
 import { addProposal, getAuthToken } from "../lib/sheet.js";
 import { Proposal } from "../interfaces/Proposal.js";
+import { v4 } from "uuid";
 
 const devVoteLength: Record<DevType, number> = {
   town: 24,
@@ -86,10 +87,10 @@ Press ✋ to object to this development.`;
         msg.react("✋");
       }
 
-      const uid = 88449507631;
+      const uuid = v4();
 
       const proposal: Proposal = {
-        uid,
+        uuid,
         name,
         proposedBy: username,
         type: displayValue[type],
@@ -103,7 +104,7 @@ Press ✋ to object to this development.`;
       addProposal(auth, proposal, "In Progress");
 
       extendObjectionVote({
-        uid,
+        uuid,
         msgId,
         userId,
         channelId,

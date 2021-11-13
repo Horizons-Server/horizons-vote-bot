@@ -102,7 +102,7 @@ export async function addProposal(
       majorDimension: "ROWS",
       values: [
         [
-          proposal.uid,
+          proposal.uuid,
           proposal.name,
           proposal.proposedBy,
           proposal.type,
@@ -157,7 +157,7 @@ function parseSheetDate(date: string) {
  */
 function arrayToProposal(input: string[]) {
   let newProposal: Proposal = {
-    uid: parseInt(input[0]),
+    uuid: input[0],
     name: input[1],
     proposedBy: input[2],
     type: input[3],
@@ -320,7 +320,7 @@ export async function deDupe(auth: Auth) {
  */
 export async function removeProposal(
   auth: Auth,
-  proposalId: number,
+  proposalId: string,
   allProposals?: AllProposals,
 ) {
   allProposals = allProposals || (await getAllProposals(auth));
@@ -328,20 +328,22 @@ export async function removeProposal(
   //figure out which sheet to delete from and where
   let sheetName: SheetName = "In Progress";
   let deletionIndex;
-  if (allProposals.approved.filter((x) => x.uid == proposalId).length > 0) {
+  if (allProposals.approved.filter((x) => x.uuid == proposalId).length > 0) {
     sheetName = "Approved";
-    deletionIndex = allProposals.approved.findIndex((x) => x.uid == proposalId);
+    deletionIndex = allProposals.approved.findIndex(
+      (x) => x.uuid == proposalId,
+    );
   } else if (
-    allProposals.denied.filter((x) => x.uid == proposalId).length > 0
+    allProposals.denied.filter((x) => x.uuid == proposalId).length > 0
   ) {
     sheetName = "Denied/Postponed";
-    deletionIndex = allProposals.denied.findIndex((x) => x.uid == proposalId);
+    deletionIndex = allProposals.denied.findIndex((x) => x.uuid == proposalId);
   } else if (
-    allProposals.inProgress.filter((x) => x.uid == proposalId).length > 0
+    allProposals.inProgress.filter((x) => x.uuid == proposalId).length > 0
   ) {
     sheetName = "In Progress";
     deletionIndex = allProposals.inProgress.findIndex(
-      (x) => x.uid == proposalId,
+      (x) => x.uuid == proposalId,
     );
   }
 

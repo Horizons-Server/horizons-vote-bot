@@ -1,5 +1,5 @@
 export interface Proposal {
-  uid: number;
+  uuid: string;
   name: string;
   proposedBy: string;
   type: string;

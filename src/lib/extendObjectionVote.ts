@@ -12,7 +12,7 @@ import {
 export async function extendObjectionVote(params: {
   msgId: string;
   channelId: string;
-  uid: number;
+  uuid: string;
   userId: string;
   time: number;
   name: string;
@@ -26,7 +26,7 @@ export async function extendObjectionVote(params: {
     channelId,
     userId,
     time,
-    uid,
+    uuid,
     name,
     numberOfRenews,
     client,
@@ -58,10 +58,10 @@ export async function extendObjectionVote(params: {
           const auth = await getAuthToken();
           const allProposals = await getAllProposals(auth);
           const proposal = allProposals.inProgress.filter(
-            (a) => a.uid === uid,
+            (a) => a.uuid === uuid,
           )[0];
 
-          removeProposal(auth, uid, allProposals);
+          removeProposal(auth, uuid, allProposals);
           addProposal(
             auth,
             { ...proposal, actionDate: Date.now() },
@@ -79,8 +79,21 @@ export async function extendObjectionVote(params: {
 
           textChannel.send(message);
 
+          const auth = await getAuthToken();
+          const allProposals = await getAllProposals(auth);
+          const proposal = allProposals.inProgress.filter(
+            (a) => a.uuid === uuid,
+          )[0];
+
+          removeProposal(auth, uuid, allProposals);
+          addProposal(
+            auth,
+            { ...proposal, actionDate: deadline.getTime() },
+            "In Progress",
+          );
+
           extendObjectionVote({
-            uid,
+            uuid,
             msgId,
             channelId,
             userId,
@@ -97,10 +110,10 @@ export async function extendObjectionVote(params: {
         const auth = await getAuthToken();
         const allProposals = await getAllProposals(auth);
         const proposal = allProposals.inProgress.filter(
-          (a) => a.uid === uid,
+          (a) => a.uuid === uuid,
         )[0];
 
-        removeProposal(auth, uid, allProposals);
+        removeProposal(auth, uuid, allProposals);
         //  console.log(proposal.dateProposed);
         addProposal(auth, { ...proposal, actionDate: Date.now() }, "Approved");
       }

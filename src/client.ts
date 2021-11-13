@@ -4,7 +4,10 @@ import { Intents, Interaction } from "discord.js";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
-import { getAllProposals, getAuthToken } from "./lib/sheet.js";
+import { deDupe, getAllProposals, getAuthToken } from "./lib/sheet.js";
+
+const auth = await getAuthToken();
+deDupe(auth);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config();
