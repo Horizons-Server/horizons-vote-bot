@@ -21,7 +21,6 @@ export async function extendObjectionVote(params: {
   client: Client<boolean>;
   emoji: string;
 }) {
-  console.log("extending....", params.time / 10000);
   const {
     msgId,
     channelId,
@@ -36,11 +35,9 @@ export async function extendObjectionVote(params: {
   } = params;
 
   setTimeout(async () => {
-    console.log("starting");
     const channel = client.channels.cache.get(channelId);
 
     if (channel && channel.type === "GUILD_TEXT") {
-      console.log("nominal");
       const textChannel = channel as TextChannel;
 
       const objections = await (
@@ -49,7 +46,6 @@ export async function extendObjectionVote(params: {
         .resolve(emoji)
         ?.fetch();
 
-      console.log(msgId, emoji, channelId, objections, channel);
       if (!objections) return;
 
       const objectionsCount = objections.count;
@@ -101,6 +97,7 @@ export async function extendObjectionVote(params: {
             {
               ...proposal,
               actionDate: deadline.getTime(),
+              numExtensions: numberOfRenews + 1,
               // objections: objectionsCount - 1,
             },
             "In Progress",
@@ -129,9 +126,8 @@ export async function extendObjectionVote(params: {
         )[0];
 
         await removeProposal(auth, uuid);
-        //  console.log(proposal.dateProposed);
         addProposal(auth, { ...proposal, actionDate: Date.now() }, "Approved");
       }
     }
-  }, time / 10000);
+  }, time);
 }

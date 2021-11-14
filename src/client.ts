@@ -46,10 +46,8 @@ client.on("interactionCreate", (interaction: Interaction) => {
 await client.login(process.env.BOT_TOKEN ?? "");
 
 const { inProgress } = await getAllProposals(auth);
-console.log(inProgress);
 
 inProgress.forEach((e) => {
-  console.log("hi");
   if (!e.otherJson) return;
   if (!e.actionDate) return;
 
