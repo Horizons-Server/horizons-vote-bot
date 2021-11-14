@@ -92,13 +92,13 @@ export async function addProposal(
 
     // The A1 notation of a range to search for a logical table of data.
     // Values are appended after the last row of the table.
-    range: `'${sheet}'!A3:K3`,
+    range: `'${sheet}'!A3:M3`,
 
     // How the input data should be interpreted.
     valueInputOption: "USER_ENTERED",
 
     resource: {
-      range: `'${sheet}'!A3:K3`,
+      range: `'${sheet}'!A3:M3`,
       majorDimension: "ROWS",
       values: [
         [
@@ -389,7 +389,7 @@ export async function removeProposal(
     spreadsheetId: SHEET_ID,
 
     // The A1 notation of the values to update.
-    range: `'${sheetName}'!A${deletionIndex}:K${deletionIndex}`,
+    range: `'${sheetName}'!A${deletionIndex}:M${deletionIndex}`,
 
     auth,
   };
