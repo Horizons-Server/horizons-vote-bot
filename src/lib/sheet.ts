@@ -10,7 +10,8 @@ import type {
 import { Proposal } from "../interfaces/Proposal";
 import { AllProposals } from "../interfaces/AllProposals";
 const sheets = google.sheets("v4");
-const SHEET_ID = "1kKN0pLIOfLHy1O3AtKGd6Vw7OxU-Q88Jn4pli5m_MqU";
+const SHEET_ID =
+  process.env.SHEET || "1kKN0pLIOfLHy1O3AtKGd6Vw7OxU-Q88Jn4pli5m_MqU";
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const KEY_FILE = "credentials.json";
 
