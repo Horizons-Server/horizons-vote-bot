@@ -1,3 +1,5 @@
+import { RawJson } from "./RawJson.js";
+
 export interface Proposal {
   uuid: string;
   name: string;
@@ -11,5 +13,5 @@ export interface Proposal {
   actionDate?: number;
   objections?: string[];
   numExtensions?: number;
-  otherJson?: unknown;
+  otherJson?: RawJson;
 }

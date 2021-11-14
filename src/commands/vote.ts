@@ -98,6 +98,14 @@ Press ✋ to object to this development.`;
         threadLink: `https://discord.com/channels/${interaction.guild?.id}/${channelId}/${thread.id}`,
         dateProposed: Date.now(),
         actionDate: firstDeadline.getTime(),
+        numExtensions: 0,
+        otherJson: {
+          userId,
+          msgId,
+          channelId,
+          emoji: "✋",
+          time: devVoteLength[type],
+        },
       };
 
       const auth = await getAuthToken();
@@ -107,8 +115,9 @@ Press ✋ to object to this development.`;
         uuid,
         msgId,
         userId,
+        originalTime: devVoteLength[type] ?? 24,
         channelId,
-        time: devVoteLength[type] ?? 24,
+        time: (devVoteLength[type] ?? 24) * 60 * 60 * 1000,
         client: interaction.client,
         numberOfRenews: 0,
         name,

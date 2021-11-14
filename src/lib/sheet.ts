@@ -142,10 +142,12 @@ export async function addProposal(
 function parseSheetDate(date: string) {
   if (date == undefined) return undefined;
 
+  const parsedDate = String(date);
+
   let outDate;
 
-  if (date.split("/").length == 3) outDate = new Date(date).getTime();
-  else outDate = parseInt(date.split("/")[0].slice(1));
+  if (parsedDate.split("/").length == 3) outDate = new Date(date).getTime();
+  else outDate = parseInt(parsedDate.split("/")[0].slice(1));
 
   if (isNaN(outDate)) return undefined;
   else return outDate;
@@ -232,7 +234,7 @@ export async function getAllProposals(auth: Auth) {
 
       if (values) {
         values.shift(); //ignore title rows
-        values.shift();
+        //values.shift();
 
         values.forEach((value: string[]) => {
           const proposal = arrayToProposal(value);

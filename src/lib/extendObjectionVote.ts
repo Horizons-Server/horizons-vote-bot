@@ -16,11 +16,12 @@ export async function extendObjectionVote(params: {
   userId: string;
   time: number;
   name: string;
-
+  originalTime: number;
   numberOfRenews: number;
   client: Client<boolean>;
   emoji: string;
 }) {
+  console.log("extending....", params.time / 10000);
   const {
     msgId,
     channelId,
@@ -30,20 +31,25 @@ export async function extendObjectionVote(params: {
     name,
     numberOfRenews,
     client,
+    originalTime,
     emoji,
   } = params;
 
   setTimeout(async () => {
+    console.log("starting");
     const channel = client.channels.cache.get(channelId);
 
     if (channel && channel.type === "GUILD_TEXT") {
+      console.log("nominal");
       const textChannel = channel as TextChannel;
 
-      const objections = await textChannel.messages.cache
-        .get(msgId)
-        ?.reactions.resolve(emoji)
+      const objections = await (
+        await textChannel.messages.fetch(msgId)
+      )?.reactions
+        .resolve(emoji)
         ?.fetch();
 
+      console.log(msgId, emoji, channelId, objections, channel);
       if (!objections) return;
 
       const objectionsCount = objections.count;
@@ -69,8 +75,12 @@ export async function extendObjectionVote(params: {
           );
         } else {
           const deadline = new Date();
-          const extendTime = numberOfRenews === 0 ? time / 2 : time;
-          deadline.setHours(deadline.getHours() + extendTime);
+          const extendTime =
+            (numberOfRenews === 0 ? originalTime / 2 : originalTime) *
+            1000 *
+            60 *
+            60;
+          deadline.setTime(deadline.getTime() + extendTime);
           const message: DevVoteRenew = `Vote "${name}" by ${getPing(
             userId,
           )} has been extended due to objections. The new deadline is ${getTimestamp(
@@ -88,7 +98,11 @@ export async function extendObjectionVote(params: {
           removeProposal(auth, uuid, allProposals);
           addProposal(
             auth,
-            { ...proposal, actionDate: deadline.getTime() },
+            {
+              ...proposal,
+              actionDate: deadline.getTime(),
+              // objections: objectionsCount - 1,
+            },
             "In Progress",
           );
 
@@ -101,6 +115,7 @@ export async function extendObjectionVote(params: {
             name,
             numberOfRenews: numberOfRenews + 1,
             client,
+            originalTime,
             emoji,
           });
         }
@@ -118,5 +133,5 @@ export async function extendObjectionVote(params: {
         addProposal(auth, { ...proposal, actionDate: Date.now() }, "Approved");
       }
     }
-  }, time * 500 /* 60 * 60*/);
+  }, time / 10000);
 }

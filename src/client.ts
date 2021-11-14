@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
 import { deDupe, getAllProposals, getAuthToken } from "./lib/sheet.js";
+import { extendObjectionVote } from "./lib/extendObjectionVote.js";
 
 const auth = await getAuthToken();
 deDupe(auth);
@@ -42,4 +43,33 @@ client.on("interactionCreate", (interaction: Interaction) => {
   client.executeInteraction(interaction);
 });
 
-client.login(process.env.BOT_TOKEN ?? "");
+await client.login(process.env.BOT_TOKEN ?? "");
+
+const { inProgress } = await getAllProposals(auth);
+console.log(inProgress);
+
+inProgress.forEach((e) => {
+  console.log("hi");
+  if (!e.otherJson) return;
+  if (!e.actionDate) return;
+
+  const newDate = new Date(e.actionDate);
+  const currDate = new Date();
+
+  const delta = newDate.getTime() - currDate.getTime();
+
+  const time = delta < 0 ? 0 : delta;
+
+  extendObjectionVote({
+    time,
+    msgId: e.otherJson.msgId,
+    emoji: e.otherJson.emoji,
+    name: e.name,
+    channelId: e.otherJson.channelId,
+    numberOfRenews: e.numExtensions || 0,
+    uuid: e.uuid,
+    client: client,
+    originalTime: e.otherJson.time,
+    userId: e.otherJson.userId,
+  });
+});
