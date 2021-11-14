@@ -10,4 +10,6 @@ export interface Proposal {
   dateProposed: number;
   actionDate?: number;
   objections?: string[];
+  numExtensions?: number;
+  otherJson?: unknown;
 }

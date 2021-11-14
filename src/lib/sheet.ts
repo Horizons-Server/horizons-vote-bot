@@ -115,6 +115,8 @@ export async function addProposal(
             ? "=" + proposal.actionDate + "/1000/60/60/24 + DATE(1970,1,1)"
             : "",
           proposal.objections?.toString() ?? "0",
+          proposal.numExtensions,
+          JSON.stringify(proposal.otherJson),
         ],
       ],
     },
@@ -150,6 +152,33 @@ function parseSheetDate(date: string) {
 }
 
 /**
+ * parseSheetProposals - parses a list  of objections into an array
+ *
+ * @param  rawInput objections from sheet
+ * @return parsed objections
+ */
+function parseSheetProposals(rawInput: string) {
+  try {
+    let array = rawInput.split(",");
+    array.forEach((item, i) => {
+      array[i] = item.trim();
+    });
+    return array;
+  } catch {
+    return undefined;
+  }
+}
+
+function parseJsonFromSheet(rawInput: string) {
+  try {
+    let parsed = JSON.parse(rawInput);
+    return parsed;
+  } catch {
+    return rawInput;
+  }
+}
+
+/**
  * arrayToProposal - converts an array from a sheet into a proposal object
  *
  * @param  input array to convert
@@ -167,6 +196,9 @@ function arrayToProposal(input: string[]) {
     threadLink: input[7],
     dateProposed: parseSheetDate(input[8]) ?? 0,
     actionDate: parseSheetDate(input[9]),
+    objections: parseSheetProposals(input[10]) ?? ["0"],
+    numExtensions: parseInt(input[11]),
+    otherJson: parseJsonFromSheet(input[12]),
   };
 
   return newProposal;
