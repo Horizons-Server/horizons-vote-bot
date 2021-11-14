@@ -67,7 +67,7 @@ export async function extendObjectionVote(params: {
             (a) => a.uuid === uuid,
           )[0];
 
-          removeProposal(auth, uuid, allProposals);
+          await removeProposal(auth, uuid);
           addProposal(
             auth,
             { ...proposal, actionDate: Date.now() },
@@ -76,7 +76,7 @@ export async function extendObjectionVote(params: {
         } else {
           const deadline = new Date();
           const extendTime =
-            (numberOfRenews === 0 ? originalTime / 2 : originalTime) *
+            (numberOfRenews === 0 ? originalTime : originalTime / 2) *
             1000 *
             60 *
             60;
@@ -95,7 +95,7 @@ export async function extendObjectionVote(params: {
             (a) => a.uuid === uuid,
           )[0];
 
-          removeProposal(auth, uuid, allProposals);
+          await removeProposal(auth, uuid);
           addProposal(
             auth,
             {
@@ -128,7 +128,7 @@ export async function extendObjectionVote(params: {
           (a) => a.uuid === uuid,
         )[0];
 
-        removeProposal(auth, uuid, allProposals);
+        await removeProposal(auth, uuid);
         //  console.log(proposal.dateProposed);
         addProposal(auth, { ...proposal, actionDate: Date.now() }, "Approved");
       }

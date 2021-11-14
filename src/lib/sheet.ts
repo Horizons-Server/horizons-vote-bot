@@ -382,7 +382,7 @@ export async function removeProposal(
   }
 
   //adjust for headers
-  if (deletionIndex != undefined && deletionIndex >= 0) deletionIndex += 3;
+  if (deletionIndex != undefined && deletionIndex >= 0) deletionIndex += 2;
 
   const request = {
     // The ID of the spreadsheet to update.
