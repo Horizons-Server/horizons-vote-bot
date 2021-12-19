@@ -14,6 +14,7 @@ const devVoteLength: Record<DevType, number> = {
   rail: 24,
   misc: 24,
   airport: 24 * 5,
+  road: 24,
 };
 
 const displayValue: Record<DevType, string> = {
@@ -21,6 +22,7 @@ const displayValue: Record<DevType, string> = {
   misc: "Miscellaneous",
   rail: "Rail 🚆",
   town: "Town 🏘",
+  road: "Road 🛣️",
 };
 
 enum DevType {
@@ -28,6 +30,7 @@ enum DevType {
   Rail = "rail",
   Misc = "misc",
   Airport = "airport",
+  Road = "road",
 }
 
 @Discord()
@@ -124,7 +127,7 @@ Press ✋ to object to this development.`;
         emoji: "✋",
       });
     } else {
-      interaction.reply("How on earth did you manage this?");
+      interaction.reply("Oops! It appears you've made an error while creating a proposal. Please try again, or ask someone for help!");
     }
   }
 }
