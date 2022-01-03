@@ -1,6 +1,6 @@
 {
   "name": "horizons-vote-bot",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "type": "module",
   "main": "build/client.js",
   "repository": "https://github.com/CaptainObi/horizons-vote-bot.git",
