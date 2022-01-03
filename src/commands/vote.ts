@@ -13,7 +13,7 @@ const devVoteLength: Record<DevType, number> = {
   town: 24,
   rail: 24,
   misc: 24,
-  airport: 24 * 5,
+  airport: 24 * 3,
   road: 24,
 };
 
