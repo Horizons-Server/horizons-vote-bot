@@ -11,7 +11,7 @@ import { Proposal } from "../interfaces/Proposal";
 import { AllProposals } from "../interfaces/AllProposals";
 const sheets = google.sheets("v4");
 const SHEET_ID =
-  process.env.SHEET || "1kKN0pLIOfLHy1O3AtKGd6Vw7OxU-Q88Jn4pli5m_MqU";
+  process.env.SHEET || "1l4Y38uVxtg6MO8PpK2nmaz3f1bc4ju7J7l0Eh9kiOZg";
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const KEY_FILE = "credentials.json";
 
