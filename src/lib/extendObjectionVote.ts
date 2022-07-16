@@ -1,4 +1,4 @@
-import type { Client, TextChannel } from "discord.js";
+import { ChannelType, Client, TextChannel } from "discord.js";
 import { DevVoteRenew } from "../types/discord.js";
 import { getPing } from "./getPing.js";
 import { getTimestamp } from "./getTimestamp.js";
@@ -37,7 +37,7 @@ export async function extendObjectionVote(params: {
   setTimeout(async () => {
     const channel = client.channels.cache.get(channelId);
 
-    if (channel && channel.type === "GUILD_TEXT") {
+    if (channel && channel.type === ChannelType.GuildText) {
       const textChannel = channel as TextChannel;
 
       const objections = await (
