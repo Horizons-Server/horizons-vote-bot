@@ -16,10 +16,6 @@ dotenv.config();
 const client = new Client({
   botId: "test",
   // glob string to load the classes
-  classes: [
-    path.join(__dirname, "commands", "**/*.{ts,js}"),
-    path.join(__dirname, "events", "**/*.{ts,js}"),
-  ],
   intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
@@ -29,11 +25,11 @@ const client = new Client({
   silent: false,
 });
 
-client.on("ready", () => {
+client.on("ready", async () => {
   console.log(">> Bot started");
 
   // to create/update/delete discord application commands
-  client.initApplicationCommands({
+  await client.initApplicationCommands({
     global: { log: true },
     guild: { log: true },
   });
