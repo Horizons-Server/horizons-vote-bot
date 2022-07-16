@@ -3,6 +3,7 @@ import { Client } from "discordx";
 import dotenv from "dotenv";
 import { deDupe, getAllProposals, getAuthToken } from "./lib/sheet.js";
 import { extendObjectionVote } from "./lib/extendObjectionVote.js";
+import { dirname, importx } from "@discordx/importer";
 
 const auth = await getAuthToken();
 deDupe(auth);
@@ -26,6 +27,8 @@ client.once("ready", async () => {
 client.on("interactionCreate", (interaction) => {
   client.executeInteraction(interaction);
 });
+
+await importx(dirname(import.meta.url) + "/commands/**/*.{js,ts}");
 
 await client.login(process.env.BOT_TOKEN ?? "");
 
