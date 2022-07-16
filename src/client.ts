@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { Client } from "discordx";
-import { Interaction, Intents } from "discord.js";
+import { Interaction, GatewayIntentsString } from "discord.js";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -16,11 +16,7 @@ dotenv.config();
 const client = new Client({
   botId: "test",
   // glob string to load the classes
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-  ],
+  intents: ["Guilds", "GuildMessageReactions", "GuildMessages"],
   botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
   silent: false,
 });

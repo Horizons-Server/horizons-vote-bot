@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { ChannelType, Message } from "discord.js";
 import type { CommandInteraction } from "discord.js";
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from "discordx";
 import { DevVoteReply } from "../types/discord";
@@ -44,14 +44,20 @@ export abstract class AppDiscord {
       description: "The description of the development.",
     })
     description: string,
-    @SlashChoice(DevType.Airport, DevType.Misc, DevType.Rail, DevType.Town, DevType.Road)
+    @SlashChoice(
+      DevType.Airport,
+      DevType.Misc,
+      DevType.Rail,
+      DevType.Town,
+      DevType.Road,
+    )
     @SlashOption("type", { description: "The type of the development." })
     type: DevType,
     interaction: CommandInteraction,
   ) {
     // create a thread
     if (
-      interaction.channel?.type === "GUILD_TEXT" &&
+      interaction.channel?.type === ChannelType.GuildText &&
       description &&
       type &&
       description &&
@@ -127,7 +133,9 @@ Press ✋ to object to this development.`;
         emoji: "✋",
       });
     } else {
-      interaction.reply("Oops! It appears you've made an error while creating a proposal. Please try again, or ask someone for help!");
+      interaction.reply(
+        "Oops! It appears you've made an error while creating a proposal. Please try again, or ask someone for help!",
+      );
     }
   }
 }
