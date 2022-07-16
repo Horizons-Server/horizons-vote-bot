@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { Client } from "discordx";
-import { Intents, Interaction } from "discord.js";
+import { Interaction, Intents } from "discord.js";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
