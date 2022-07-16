@@ -44,7 +44,7 @@ export abstract class AppDiscord {
       description: "The description of the development.",
     })
     description: string,
-    @SlashChoice(DevType)
+    @SlashChoice(DevType.Airport, DevType.Misc, DevType.Rail, DevType.Town, DevType.Road)
     @SlashOption("type", { description: "The type of the development." })
     type: DevType,
     interaction: CommandInteraction,
