@@ -1,16 +1,12 @@
 import "reflect-metadata";
 import { Client } from "discordx";
-import { Interaction, GatewayIntentsString } from "discord.js";
 import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import path from "path";
 import { deDupe, getAllProposals, getAuthToken } from "./lib/sheet.js";
 import { extendObjectionVote } from "./lib/extendObjectionVote.js";
 
 const auth = await getAuthToken();
 deDupe(auth);
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config();
 
 const client = new Client({
@@ -21,17 +17,13 @@ const client = new Client({
   silent: false,
 });
 
-client.on("ready", async () => {
-  console.log(">> Bot started");
+client.once("ready", async () => {
+  await client.initApplicationCommands();
 
-  // to create/update/delete discord application commands
-  await client.initApplicationCommands({
-    global: { log: true },
-    guild: { log: true },
-  });
+  // await client.initApplicationPermissions();
 });
 
-client.on("interactionCreate", (interaction: Interaction) => {
+client.on("interactionCreate", (interaction) => {
   client.executeInteraction(interaction);
 });
 

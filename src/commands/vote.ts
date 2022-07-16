@@ -34,7 +34,7 @@ enum DevType {
 }
 
 @Discord()
-@SlashGroup("vote", "Start a vote on the server")
+@SlashGroup({ name: "vote", description: "Start a vote on the server" })
 export abstract class AppDiscord {
   @Slash("development")
   async development(
