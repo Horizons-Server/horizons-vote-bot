@@ -54,6 +54,10 @@ export abstract class AppDiscord {
     )
     @SlashOption("type", { description: "The type of the development." })
     type: DevType,
+    @SlashOption("x", { description: "x coordinate" })
+    xCord: number,
+    @SlashOption("y", { description: "y coordinate" })
+    yCord: number,
     interaction: CommandInteraction,
   ) {
     // create a thread
@@ -82,6 +86,7 @@ export abstract class AppDiscord {
       const messageContent: DevVoteReply = `___Development Vote___
 **Name**: ${name}
 **Description**: ${description}
+**Coordinates** ${xCord}, ${yCord}
 **Proposed By**: ${getPing(userId)}
 **Proposal Type**: ${displayValue[type]}
 **First Deadline**: ${getTimestamp(firstDeadline)}
@@ -102,6 +107,8 @@ Press ✋ to object to this development.`;
       const proposal: Proposal = {
         uuid,
         name,
+        xCord,
+        yCord,
         proposedBy: username,
         type: displayValue[type],
         description,

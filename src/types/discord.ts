@@ -3,6 +3,7 @@ export type Timestamp = `<t:${number}:R>`;
 export type DevVoteReply = `___Development Vote___
 **Name**: ${string}
 **Description**: ${string}
+**Coordinates** ${number}, ${number}
 **Proposed By**: ${Ping}
 **Proposal Type**: ${string}
 **First Deadline**: ${Timestamp}

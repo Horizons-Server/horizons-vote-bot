@@ -3,10 +3,11 @@ import { RawJson } from "./RawJson.js";
 export interface Proposal {
   uuid: string;
   name: string;
+  xCord: number;
+  yCord: number;
   proposedBy: string;
   type: string;
   description: string;
-  coordinates?: string;
   imageLink?: string;
   threadLink: string;
   dateProposed: number;
