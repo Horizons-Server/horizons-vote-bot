@@ -6,7 +6,7 @@ import { extendObjectionVote } from "../lib/extendObjectionVote.js";
 import { getTimestamp } from "../lib/getTimestamp.js";
 import { getPing } from "../lib/getPing.js";
 import { addProposal, getAuthToken } from "../lib/sheet.js";
-import { Proposal } from "../interfaces/Proposal.js";
+import { Proposal } from "../interfaces/proposal.js";
 import { v4 } from "uuid";
 
 const devVoteLength: Record<DevType, number> = {
@@ -68,12 +68,6 @@ export abstract class AppDiscord {
       const username = interaction.user.username;
       const channelId = interaction.channel.id;
 
-      const thread = await interaction.channel.threads.create({
-        name: `${name} by ${username}`,
-        reason: `To discuss the topic at vote ${name}. `,
-      });
-      thread.members.add(userId);
-
       const firstDeadline = new Date();
       firstDeadline.setHours(
         firstDeadline.getHours() + devVoteLength[type] ?? 24,
@@ -96,6 +90,12 @@ Press ✋ to object to this development.`;
       if (msg instanceof Message) {
         msg.react("✋");
       }
+
+      const thread = await msg.startThread({
+        name: `${name} by ${username}`,
+        reason: `To discuss the topic at vote ${name}. `,
+      });
+      thread.members.add(userId);
 
       const uuid = v4();
 

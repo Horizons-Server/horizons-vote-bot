@@ -1,4 +1,4 @@
-import { RawJson } from "./RawJson.js";
+import { RawJson } from "./rawJson.js";
 
 export interface Proposal {
   uuid: string;

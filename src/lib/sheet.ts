@@ -7,8 +7,8 @@ import type {
   JWT,
   UserRefreshClient,
 } from "google-auth-library";
-import { Proposal } from "../interfaces/Proposal";
-import { AllProposals } from "../interfaces/AllProposals";
+import { Proposal } from "../interfaces/proposal";
+import { AllProposals } from "../interfaces/allProposals";
 const sheets = google.sheets("v4");
 const SHEET_ID =
   process.env.SHEET || "1l4Y38uVxtg6MO8PpK2nmaz3f1bc4ju7J7l0Eh9kiOZg";
