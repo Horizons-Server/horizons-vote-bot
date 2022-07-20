@@ -1,4 +1,4 @@
-import { Proposal } from "./proposal";
+import { Proposal } from "./proposal.js";
 
 export interface AllProposals {
   approved: Proposal[];
