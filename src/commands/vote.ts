@@ -39,9 +39,10 @@ enum DevType {
 export abstract class AppDiscord {
   @Slash()
   async development(
-    @SlashOption("name", { description: "The name of the development." })
+    @SlashOption({ name: "name", description: "The name of the development." })
     name: string,
-    @SlashOption("description", {
+    @SlashOption({
+      name: "description",
       description: "The description of the development.",
     })
     description: string,
@@ -52,7 +53,7 @@ export abstract class AppDiscord {
       DevType.Town,
       DevType.Road,
     )
-    @SlashOption("type", { description: "The type of the development." })
+    @SlashOption({ name: "type", description: "The type of the development." })
     type: DevType,
     interaction: CommandInteraction,
   ) {
