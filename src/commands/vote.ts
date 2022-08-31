@@ -90,6 +90,7 @@ Press ✋ to object to this development.`;
 
       if (msg instanceof Message) {
         msg.react("✋");
+        msg.react("❌");
       }
 
       const thread = await msg.startThread({
