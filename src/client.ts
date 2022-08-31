@@ -48,7 +48,7 @@ inProgress.forEach((e) => {
   extendObjectionVote({
     time,
     msgId: e.otherJson.msgId,
-    emoji: e.otherJson.emoji,
+    objectEmoji: e.otherJson.objectEmoji,
     name: e.name,
     channelId: e.otherJson.channelId,
     numberOfRenews: e.numExtensions || 0,
@@ -56,5 +56,6 @@ inProgress.forEach((e) => {
     client: client,
     originalTime: e.otherJson.time,
     userId: e.otherJson.userId,
+    cancelEmoji: e.otherJson.cancelEmoji,
   });
 });

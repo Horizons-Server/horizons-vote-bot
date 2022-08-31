@@ -19,7 +19,8 @@ export async function extendObjectionVote(params: {
   originalTime: number;
   numberOfRenews: number;
   client: Client<boolean>;
-  emoji: string;
+  objectEmoji: string;
+  cancelEmoji: string;
 }) {
   const {
     msgId,
@@ -31,7 +32,8 @@ export async function extendObjectionVote(params: {
     numberOfRenews,
     client,
     originalTime,
-    emoji,
+    objectEmoji,
+    cancelEmoji,
   } = params;
 
   setTimeout(async () => {
@@ -42,13 +44,29 @@ export async function extendObjectionVote(params: {
 
       const objections = await (
         await textChannel.messages.fetch(msgId)
-      )?.reactions
-        .resolve(emoji)
+      ).reactions
+        .resolve(objectEmoji)
         ?.fetch();
+
+      const cancellations = await (
+        await textChannel.messages.fetch(msgId)
+      ).reactions
+        .resolve(cancelEmoji)
+        ?.fetch();
+
+      const cancelled =
+        (await cancellations?.users.fetch())?.has(userId) ?? false;
 
       if (!objections) return;
 
       const objectionsCount = objections.count;
+      const auth = await getAuthToken();
+
+      if (cancelled) {
+        await removeProposal(auth, uuid);
+        const message = `Vote ${name} has been cancelled.`;
+        await textChannel.send(message);
+      }
 
       if (objectionsCount > 1) {
         if (numberOfRenews > 3) {
@@ -57,7 +75,6 @@ export async function extendObjectionVote(params: {
           )} has been renewed ${numberOfRenews} times. Since the vote still has objections, it has failed.`;
           textChannel.send(message);
 
-          const auth = await getAuthToken();
           const allProposals = await getAllProposals(auth);
           const proposal = allProposals.inProgress.filter(
             (a) => a.uuid === uuid,
@@ -113,7 +130,8 @@ export async function extendObjectionVote(params: {
             numberOfRenews: numberOfRenews + 1,
             client,
             originalTime,
-            emoji,
+            objectEmoji,
+            cancelEmoji,
           });
         }
       } else {

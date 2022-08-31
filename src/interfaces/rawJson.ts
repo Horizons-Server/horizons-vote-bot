@@ -1,6 +1,7 @@
 export interface RawJson {
   msgId: string;
-  emoji: string;
+  objectEmoji: string;
+  cancelEmoji: string;
   channelId: string;
   time: number;
   userId: string;

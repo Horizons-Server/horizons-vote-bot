@@ -114,7 +114,8 @@ Press ✋ to object to this development.`;
           userId,
           msgId,
           channelId,
-          emoji: "✋",
+          objectEmoji: "✋",
+          cancelEmoji: "❌",
           time: devVoteLength[type],
         },
       };
@@ -132,7 +133,8 @@ Press ✋ to object to this development.`;
         client: interaction.client,
         numberOfRenews: 0,
         name,
-        emoji: "✋",
+        objectEmoji: "✋",
+        cancelEmoji: "❌",
       });
     } else {
       interaction.reply(
