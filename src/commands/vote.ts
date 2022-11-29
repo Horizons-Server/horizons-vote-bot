@@ -1,13 +1,17 @@
-import { ChannelType, Message } from "discord.js";
-import type { CommandInteraction } from "discord.js";
+import {
+  ApplicationCommandOptionType,
+  ChannelType,
+  CommandInteraction,
+  Message,
+} from "discord.js";
 import { Discord, Slash, SlashChoice, SlashGroup, SlashOption } from "discordx";
-import { DevVoteReply } from "../types/discord";
-import { extendObjectionVote } from "../lib/extendObjectionVote.js";
-import { getTimestamp } from "../lib/getTimestamp.js";
-import { getPing } from "../lib/getPing.js";
-import { addProposal, getAuthToken } from "../lib/sheet.js";
-import { Proposal } from "../interfaces/proposal.js";
 import { v4 } from "uuid";
+import { Proposal } from "../interfaces/proposal.js";
+import { extendObjectionVote } from "../lib/extendObjectionVote.js";
+import { getPing } from "../lib/getPing.js";
+import { getTimestamp } from "../lib/getTimestamp.js";
+import { addProposal, getAuthToken } from "../lib/sheet.js";
+import { DevVoteReply } from "../types/discord";
 
 const devVoteLength: Record<DevType, number> = {
   town: 24,
@@ -37,13 +41,18 @@ enum DevType {
 @SlashGroup({ name: "vote", description: "Start a vote on the server" })
 @SlashGroup("vote")
 export abstract class AppDiscord {
-  @Slash()
+  @Slash({ description: "Start a development vote" })
   async development(
-    @SlashOption({ name: "name", description: "The name of the development." })
+    @SlashOption({
+      name: "name",
+      description: "The name of the development.",
+      type: ApplicationCommandOptionType.String,
+    })
     name: string,
     @SlashOption({
       name: "description",
       description: "The description of the development.",
+      type: ApplicationCommandOptionType.String,
     })
     description: string,
     @SlashChoice(
@@ -53,7 +62,7 @@ export abstract class AppDiscord {
       DevType.Town,
       DevType.Road,
     )
-    @SlashOption({ name: "type", description: "The type of the development." })
+    @SlashOption({ name: "type", description: "The type of the development.", type: ApplicationCommandOptionType.String })
     type: DevType,
     interaction: CommandInteraction,
   ) {
