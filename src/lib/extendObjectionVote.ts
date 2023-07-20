@@ -6,6 +6,7 @@ import {
   addProposal,
   getAllProposals,
   getAuthToken,
+  initalizeSheet,
   removeProposal,
 } from "./sheet.js";
 
@@ -61,9 +62,10 @@ export async function extendObjectionVote(params: {
 
       const objectionsCount = objections.count;
       const auth = await getAuthToken();
+      await initalizeSheet(auth);
 
       if (cancelled) {
-        await removeProposal(auth, uuid);
+        await removeProposal(uuid);
         const message = `Vote ${name} has been cancelled.`;
         await textChannel.send(message);
       }
@@ -75,14 +77,13 @@ export async function extendObjectionVote(params: {
           )} has been renewed ${numberOfRenews} times. Since the vote still has objections, it has failed.`;
           textChannel.send(message);
 
-          const allProposals = await getAllProposals(auth);
+          const allProposals = await getAllProposals();
           const proposal = allProposals.inProgress.filter(
             (a) => a.uuid === uuid,
           )[0];
 
-          await removeProposal(auth, uuid);
+          await removeProposal(uuid);
           addProposal(
-            auth,
             { ...proposal, actionDate: Date.now() },
             "Denied/Postponed",
           );
@@ -103,14 +104,14 @@ export async function extendObjectionVote(params: {
           textChannel.send(message);
 
           const auth = await getAuthToken();
-          const allProposals = await getAllProposals(auth);
+          initalizeSheet(auth);
+          const allProposals = await getAllProposals();
           const proposal = allProposals.inProgress.filter(
             (a) => a.uuid === uuid,
           )[0];
 
-          await removeProposal(auth, uuid);
+          await removeProposal(uuid);
           addProposal(
-            auth,
             {
               ...proposal,
               actionDate: deadline.getTime(),
@@ -138,13 +139,14 @@ export async function extendObjectionVote(params: {
         textChannel.send(`Vote "${name}" by ${getPing(userId)} has passed.`);
 
         const auth = await getAuthToken();
-        const allProposals = await getAllProposals(auth);
+        initalizeSheet(auth);
+        const allProposals = await getAllProposals();
         const proposal = allProposals.inProgress.filter(
           (a) => a.uuid === uuid,
         )[0];
 
-        await removeProposal(auth, uuid);
-        addProposal(auth, { ...proposal, actionDate: Date.now() }, "Approved");
+        await removeProposal(uuid);
+        addProposal({ ...proposal, actionDate: Date.now() }, "Approved");
       }
     }
   }, time);

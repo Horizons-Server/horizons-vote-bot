@@ -10,7 +10,7 @@ import { Proposal } from "../interfaces/proposal.js";
 import { extendObjectionVote } from "../lib/extendObjectionVote.js";
 import { getPing } from "../lib/getPing.js";
 import { getTimestamp } from "../lib/getTimestamp.js";
-import { addProposal, getAuthToken } from "../lib/sheet.js";
+import { addProposal, getAuthToken, initalizeSheet } from "../lib/sheet.js";
 import { DevVoteReply } from "../types/discord";
 
 const devVoteLength: Record<DevType, number> = {
@@ -131,7 +131,8 @@ Press ✋ to object to this development.`;
       };
 
       const auth = await getAuthToken();
-      addProposal(auth, proposal, "In Progress");
+      initalizeSheet(auth)
+      addProposal(proposal, "In Progress");
 
       extendObjectionVote({
         uuid,

@@ -1,12 +1,15 @@
 import "reflect-metadata";
 import { Client } from "discordx";
 import dotenv from "dotenv";
-import { deDupe, getAllProposals, getAuthToken } from "./lib/sheet.js";
+import { deDupe, getAllProposals, getAuthToken, initalizeSheet } from "./lib/sheet.js";
 import { extendObjectionVote } from "./lib/extendObjectionVote.js";
 import { dirname, importx } from "@discordx/importer";
 
 const auth = await getAuthToken();
-deDupe(auth);
+
+initalizeSheet(auth);
+
+await deDupe();
 
 dotenv.config();
 
@@ -32,7 +35,7 @@ await importx(dirname(import.meta.url) + "/commands/**/*.{js,ts}");
 
 await client.login(process.env.BOT_TOKEN ?? "");
 
-const { inProgress } = await getAllProposals(auth);
+const { inProgress } = await getAllProposals();
 
 inProgress.forEach((e) => {
   if (!e.otherJson) return;
