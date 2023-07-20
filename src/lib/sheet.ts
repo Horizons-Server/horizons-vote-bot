@@ -1,14 +1,10 @@
 import { google } from "googleapis";
 import { GoogleAuth } from "google-auth-library";
-import type {
-  BaseExternalAccountClient,
-  Compute,
-  Impersonated,
-  JWT,
-  UserRefreshClient,
-} from "google-auth-library";
+import type { Compute } from "google-auth-library";
 import { Proposal } from "../interfaces/proposal";
 import { AllProposals } from "../interfaces/allProposals";
+import { } from "google-auth-library";
+import { JSONClient } from "google-auth-library/build/src/auth/googleauth";
 const sheets = google.sheets("v4");
 const SHEET_ID =
   process.env.SHEET || "1l4Y38uVxtg6MO8PpK2nmaz3f1bc4ju7J7l0Eh9kiOZg";
@@ -16,12 +12,7 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const KEY_FILE = "credentials.json";
 
 type SheetName = "Approved" | "Denied/Postponed" | "In Progress";
-export type Auth =
-  | JWT
-  | Compute
-  | UserRefreshClient
-  | BaseExternalAccountClient
-  | Impersonated;
+export type Auth = Awaited<ReturnType<typeof getAuthToken>>;
 
 /**
  * getAuthToken - authenticates the service account and returns an auth token
@@ -29,12 +20,17 @@ export type Auth =
  * @return authentication token for use in requests
  */
 export async function getAuthToken() {
-  const auth = new GoogleAuth({
+  const auth = new google.auth.GoogleAuth({
     keyFile: KEY_FILE,
     scopes: SCOPES,
   });
+
   const authToken = await auth.getClient();
   return authToken;
+}
+
+export async function initalizeSheet(auth: Auth) {
+  google.options({ auth });
 }
 
 /**
@@ -44,10 +40,10 @@ export async function getAuthToken() {
  * @param  auth authToken
  * @return all sheet information
  */
-async function getSpreadSheet(spreadsheetId: string, auth: Auth) {
+async function getSpreadSheet(spreadsheetId: string) {
   const res = await sheets.spreadsheets.get({
     spreadsheetId,
-    auth,
+    // options: { auth },
   });
   return res;
 }
@@ -62,12 +58,11 @@ async function getSpreadSheet(spreadsheetId: string, auth: Auth) {
  */
 async function getSpreadSheetValues(
   spreadsheetId: string,
-  auth: Auth,
   sheetName: SheetName,
 ) {
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    auth,
+    // auth,
     range: sheetName,
     valueRenderOption: "FORMULA",
   });
@@ -83,7 +78,6 @@ async function getSpreadSheetValues(
  * @return append response from google, else returns error
  */
 export async function addProposal(
-  auth: Auth,
   proposal: Proposal,
   sheet: SheetName = "In Progress",
 ) {
@@ -121,8 +115,6 @@ export async function addProposal(
         ],
       ],
     },
-
-    auth,
   };
 
   try {
@@ -213,7 +205,7 @@ function arrayToProposal(input: string[]) {
  * @param auth authToken
  * @return all proposals object
  */
-export async function getAllProposals(auth: Auth) {
+export async function getAllProposals() {
   let sheetsToIterate: SheetName[] = [
     "Approved",
     "In Progress",
@@ -230,7 +222,7 @@ export async function getAllProposals(auth: Auth) {
   let gettingSheets = new Promise((resolve) => {
     let numToResolve = sheetsToIterate.length;
     sheetsToIterate.forEach(async (sheetName) => {
-      let spreadsheet = await getSpreadSheetValues(SHEET_ID, auth, sheetName);
+      let spreadsheet = await getSpreadSheetValues(SHEET_ID, sheetName);
       let values = spreadsheet.data.values;
 
       if (values) {
@@ -270,7 +262,7 @@ export async function getAllProposals(auth: Auth) {
  * @param  authToken
  * @return batch response from google or error
  */
-export async function deDupe(auth: Auth) {
+export async function deDupe() {
   const request = {
     // The spreadsheet to apply the updates to.
     spreadsheetId: SHEET_ID,
@@ -333,8 +325,6 @@ export async function deDupe(auth: Auth) {
         },
       ],
     },
-
-    auth,
   };
 
   try {
@@ -354,11 +344,10 @@ export async function deDupe(auth: Auth) {
  * @return list of all proposals
  */
 export async function removeProposal(
-  auth: Auth,
   proposalId: string,
   allProposals?: AllProposals,
 ) {
-  allProposals = allProposals || (await getAllProposals(auth));
+  allProposals = allProposals || (await getAllProposals());
 
   //figure out which sheet to delete from and where
   let sheetName: SheetName = "In Progress";
@@ -391,8 +380,6 @@ export async function removeProposal(
 
     // The A1 notation of the values to update.
     range: `'${sheetName}'!A${deletionIndex}:M${deletionIndex}`,
-
-    auth,
   };
 
   try {
