@@ -68,6 +68,7 @@ export async function extendObjectionVote(params: {
         await removeProposal(uuid);
         const message = `Vote ${name} has been cancelled.`;
         await textChannel.send(message);
+        return;
       }
 
       if (objectionsCount > 1) {
