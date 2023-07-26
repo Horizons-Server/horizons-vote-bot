@@ -30,7 +30,7 @@ export async function getAuthToken() {
 }
 
 export async function initalizeSheet(auth: Auth) {
-  google.options({ auth });
+  google.options({ auth: auth as any });
 }
 
 /**
