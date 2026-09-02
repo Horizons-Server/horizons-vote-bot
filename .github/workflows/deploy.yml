@@ -1,0 +1,16 @@
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v7
+      - name: Build Image
+        run: docker build --tag vote-bot:latest .
+      - name: Tag Image
+        run: docker image tag vote-bot registry.horizons-server.org/vote-bot
+      - name: Login to Registry
+        run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin https://registry.horizons-server.org
+      - name: Push to Registry
+        run: docker push registry.horizons-server.org/vote-bot
